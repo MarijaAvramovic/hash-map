@@ -35,5 +35,25 @@ hash(key) {
     return hashCode;
   }
     
-    
+    set(key, value) {
+    const index = this.hash(key);
+
+    // Enforce bounds (though hash() already guarantees it)
+    if (index < 0 || index >= this.buckets.length) {
+      throw new Error("Trying to access index out of bounds");
+    }
+
+    const bucket = this.buckets[index];
+
+    // Check if key already exists → update value (overwrite)
+    for (let i = 0; i < bucket.length; i++) {
+      if (bucket[i][0] === key) {
+        bucket[i][1] = value;          // replace old value with new one
+        return;                        // done — no size change, no resize
+      }
+    }
+
+    // Key doesn't exist → add new entry
+    bucket.push([key, value]);
+    this.size++;
   }
