@@ -1,4 +1,4 @@
-class HashMap {
+export class HashMap {
   constructor(initialCapacity = 16) {
     this.capacity = initialCapacity;
     this.loadFactor = 0.75;
@@ -9,12 +9,7 @@ class HashMap {
   }
 
 
-  class  HashMap {
-    constructor(parameters) {
-        this.capacity = initialCapacity;
-        this.loadFactor = 0.75;
-    }
-    
+  
 hash(key) {
     if (typeof key !== 'string') {
       throw new Error('HashMap only accepts string keys');
@@ -35,7 +30,26 @@ hash(key) {
 
     return hashCode;
   }
-    
+
+  _shouldResize() {
+    return this.size / this.capacity > this.loadFactor;
+  }
+
+  // Double capacity and rehash everything
+  _resize() {
+    const oldBuckets = this.buckets;
+    this.capacity *= 2;
+    this.buckets = Array(this.capacity).fill(null).map(() => []);
+    this.size = 0; // reset, will be incremented during re-insertion
+
+    // Re-insert all existing pairs (they will get new hashes based on new capacity)
+    for (const bucket of oldBuckets) {
+      for (const [key, value] of bucket) {
+        // Use set() so it handles hashing + possible future collisions correctly
+        this.set(key, value);
+      }
+    }
+  }
     set(key, value) {
     const index = this.hash(key);
 
@@ -57,7 +71,12 @@ hash(key) {
     // Key doesn't exist → add new entry
     bucket.push([key, value]);
     this.size++;
+
+    if (this._shouldResize()) {
+      this._resize();
     }
+  }
+    
 
     get(key) {
     const index = this.hash(key);
@@ -165,5 +184,16 @@ keys() {
 
     return allValues;
   }
-  
-  }
+  entries() {
+    const allEntries = [];
+
+    // Iterate through every bucket
+    for (const bucket of this.buckets) {
+      // Add each [key, value] pair from the chain
+      for (const pair of bucket) {
+        allEntries.push(pair);
+      }
+    }
+
+    return allEntries;
+  }}
