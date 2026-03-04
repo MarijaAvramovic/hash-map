@@ -124,5 +124,46 @@ has(key) {
     // Key not found in the bucket
     return false;
   }
+
+  length() {
+    return this.size;
+  }
+  
+  clear() {
+    // Most straightforward and efficient way:
+    // Re-create the buckets array with the current capacity
+    this.buckets = Array(this.capacity)
+      .fill(null)
+      .map(() => []);
+
+    // Reset the count of entries
+    this.size = 0;
+  }
+keys() {
+    const allKeys = [];
+
+    // Iterate through every bucket
+    for (const bucket of this.buckets) {
+      // Add each key from the chain (collision list)
+      for (const [key] of bucket) {
+        allKeys.push(key);
+      }
+    }
+
+    return allKeys;
+  }
+  values() {
+    const allValues = [];
+
+    // Iterate through every bucket
+    for (const bucket of this.buckets) {
+      // Extract the value from each [key, value] pair in the chain
+      for (const [, value] of bucket) {
+        allValues.push(value);
+      }
+    }
+
+    return allValues;
+  }
   
   }
